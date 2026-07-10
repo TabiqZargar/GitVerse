@@ -1,53 +1,41 @@
 import Link from "next/link";
-import { GradientButton } from "@/components/design-system/gradient-button";
+import { cn } from "@/lib/utils";
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,oklch(0.65_0.2_265/0.08),transparent_60%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,oklch(0.7_0.18_170/0.04),transparent_50%)]" />
-
-      <main className="relative z-10 flex flex-col items-center gap-8 px-4 text-center">
-        <div className="bg-gradient-to-br from-primary/20 to-primary/5 mb-2 flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/10 shadow-glow">
-          <span className="bg-gradient-to-br from-primary to-primary/60 bg-clip-text text-2xl font-bold text-transparent">
-            G
+    <main className="relative z-10 min-h-screen flex flex-col items-center justify-center text-center px-gutter pt-unit-xxl">
+      <div className="max-w-4xl space-y-unit-lg">
+        {/* Animated Badge */}
+        <div className="inline-flex items-center gap-unit-sm px-4 py-1.5 rounded-full glass-panel border-white/10 mb-unit-md animate-fade-in">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-secondary"></span>
           </span>
+          <span className="font-label-mono text-label-mono text-secondary uppercase tracking-widest">New: Visual Commit Galaxy</span>
         </div>
-
-        <h1 className="max-w-2xl text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-          Your GitHub history
-          <br />
-          <span className="text-gradient">in a new dimension</span>
+        
+        {/* Massive Headline */}
+        <h1 className="font-display-xl text-display-xl tracking-tighter text-white leading-none">
+          Explore Your <br/>
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary-container animate-pulse">Coding Universe</span>
         </h1>
-
-        <p className="text-muted-foreground max-w-md text-lg">
-          Transform your development journey into an immersive, interactive universe.
+        
+        {/* Subheading */}
+        <p className="font-body-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed opacity-80">
+          Every commit tells a story. Watch yours come alive through high-fidelity visualizations, deep repository insights, and an immersive developer identity experience.
         </p>
-
-        <div className="flex gap-4">
-          <Link href="/login">
-            <GradientButton size="lg">Get Started</GradientButton>
+        
+        {/* Primary CTA */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-unit-md pt-unit-lg">
+          <Link href="/api/auth/signin" className="group relative px-unit-xl py-4 rounded-xl bg-primary text-on-primary font-bold flex items-center gap-unit-sm shadow-[0_0_30px_-5px_rgba(210,187,255,0.4)] hover:scale-105 transition-all">
+            <span className="material-symbols-outlined">terminal</span>
+            Login with GitHub
           </Link>
-          <Link href="/dashboard">
-            <GradientButton variant="subtle" size="lg">
-              Dashboard
-            </GradientButton>
+          <Link href="/dashboard" className="px-unit-xl py-4 rounded-xl glass-panel text-on-surface font-semibold border-white/10 hover:bg-white/5 transition-all">
+            View Demo Universe
           </Link>
         </div>
-
-        <div className="mt-8 grid grid-cols-3 gap-8">
-          {[
-            { label: "Repositories", value: "Unlimited" },
-            { label: "Visualizations", value: "3D + Flow" },
-            { label: "Insights", value: "AI-Powered" },
-          ].map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center gap-1">
-              <span className="text-sm font-semibold">{stat.value}</span>
-              <span className="text-muted-foreground text-xs">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

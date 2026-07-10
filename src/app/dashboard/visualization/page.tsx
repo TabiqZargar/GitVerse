@@ -1,126 +1,62 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import dynamic from "next/dynamic";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@/features/auth/hooks/use-auth";
-import { useContributions } from "@/features/github/hooks/use-contributions";
-import { LandscapeScene } from "@/features/visualization/components/landscape/landscape-scene";
-import { adaptGitHubDaysToTiles, computeStreakDays } from "@/features/visualization/components/landscape/data-adapter";
-import { useReplayStore } from "@/features/replay/store";
 import { useUniverseData } from "@/features/repository-universe/hooks/use-universe-data";
-import { useUniverseStore } from "@/features/repository-universe/store";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
 
 const RepositoryUniverse = dynamic(
   () => import("@/features/repository-universe/components/repository-universe")
     .then((mod) => ({ default: mod.RepositoryUniverse })),
-  { ssr: false }
+  { ssr: false, loading: () => <Skeleton className="h-[700px] w-full rounded-3xl" /> }
 );
 
-const ContributionGalaxy = dynamic(
-  () => import("@/features/contribution-galaxy/components/contribution-galaxy")
-    .then((mod) => ({ default: mod.ContributionGalaxy })),
-  { ssr: false }
-);
-
-export default function VisualizationPage() {
-  const { user } = useAuth();
-  const username = user?.name ?? undefined;
-
-  const { data: contributions, isLoading: contribsLoading } = useContributions(username);
-  const { bodies, isLoading: reposLoading } = useUniverseData();
-  const setTiles = useReplayStore((s) => s.setTiles);
-  const currentDate = useReplayStore((s) => s.currentDate);
-  const setBodies = useUniverseStore((s) => s.setBodies);
-
-  useEffect(() => {
-    if (bodies && bodies.length > 0) {
-      setBodies(bodies);
-    }
-  }, [bodies, setBodies]);
-
-  const days = useMemo(() => {
-    if (!contributions?.success) return [];
-    const calendar = contributions.data;
-    if (!calendar?.days) return [];
-    return calendar.days;
-  }, [contributions]);
-
-  const tileData = useMemo(() => {
-    if (days.length === 0) return undefined;
-    const tiles = adaptGitHubDaysToTiles(days);
-    const streakDays = computeStreakDays(tiles);
-    return tiles.map((t) => ({
-      ...t,
-      isCurrentStreak: streakDays.has(t.date),
-    }));
-  }, [days]);
-
-  useEffect(() => {
-    if (tileData && tileData.length > 0) {
-      setTiles(tileData);
-    }
-  }, [tileData, setTiles]);
+export default function UniversePage() {
+  const { bodies, isLoading } = useUniverseData();
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Visualization</h1>
-        <p className="text-muted-foreground mt-2">Explore your contributions in 3D and interactive flows</p>
+    <div className="h-screen w-full relative overflow-hidden bg-[#050816]">
+      {/* Background Atmosphere */}
+      <div className="fixed inset-0 z-0">
+        <div className="starfield absolute inset-0 opacity-40"></div>
+        <div className="absolute inset-0 aurora-bg"></div>
       </div>
 
-      <Card className="overflow-hidden">
-        <CardHeader>
-          <CardTitle>Repository Universe</CardTitle>
-          <CardDescription>
-            Every repository becomes a celestial body in an interactive galaxy
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="h-[700px] w-full">
-            <RepositoryUniverse
-              bodies={bodies ?? []}
-              isLoading={reposLoading}
-            />
+      {/* Main Universe View */}
+      <div className="relative z-10 h-full w-full flex items-center justify-center">
+        {isLoading ? (
+            <Skeleton className="h-[500px] w-[500px] rounded-full" />
+        ) : (
+            <RepositoryUniverse bodies={bodies ?? []} isLoading={isLoading} />
+        )}
+      </div>
+      
+      {/* Inspector Panel - Polished */}
+      <motion.section 
+        initial={{ x: 384 }}
+        animate={{ x: 0 }}
+        className="fixed right-unit-lg top-unit-xxl bottom-unit-lg w-96 z-30 glass-panel bg-surface-dim/40 border border-white/10 rounded-3xl p-unit-lg flex flex-col gap-unit-lg shadow-2xl"
+      >
+        <div className="space-y-unit-sm">
+          <div className="flex justify-between items-start">
+            <span className="text-primary font-label-mono text-[10px] tracking-widest uppercase">Currently Inspecting</span>
+            <button className="material-symbols-outlined text-on-surface-variant hover:text-on-surface transition-colors">close</button>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="overflow-hidden">
-        <CardHeader>
-          <CardTitle>Contribution Landscape</CardTitle>
-          <CardDescription>
-            Every day becomes terrain. Higher contributions create taller mountains.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="h-[600px] w-full">
-            <LandscapeScene
-              days={tileData}
-              isLoading={contribsLoading}
-              currentDate={currentDate}
-            />
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">Repository Universe</h2>
+          <p className="font-body-lg text-on-surface-variant/80 text-sm">Interactive visualization of your repository constellation.</p>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-unit-md">
+          <div className="bg-white/5 p-unit-md rounded-xl border border-white/5">
+            <span className="font-label-mono text-[10px] text-on-surface-variant block mb-1">Stars</span>
+            <span className="font-headline-sm text-headline-sm">0</span>
           </div>
-        </CardContent>
-      </Card>
-
-      <Card className="overflow-hidden">
-        <CardHeader>
-          <CardTitle>Contribution Galaxy</CardTitle>
-          <CardDescription>
-            Every contribution becomes a glowing star in a living galaxy
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="h-[700px] w-full">
-            <ContributionGalaxy
-              days={days}
-              layout="spiral"
-              reducedMotion={false}
-            />
+          <div className="bg-white/5 p-unit-md rounded-xl border border-white/5">
+            <span className="font-label-mono text-[10px] text-on-surface-variant block mb-1">Forks</span>
+            <span className="font-headline-sm text-headline-sm">0</span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </motion.section>
     </div>
   );
 }

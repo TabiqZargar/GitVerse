@@ -28,10 +28,21 @@ export function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
+export function generateId(length: number = 12): string {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(array[i]! % chars.length);
+  }
+  return result;
+}
+
 export function getInitials(name: string): string {
   return name
     .split(" ")
-    .map((n) => n[0])
+    .map((n) => n[0] ?? "")
     .filter(Boolean)
     .slice(0, 2)
     .join("")
