@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { NavigationBar } from "@/components/design-system/navigation-bar";
-import { Timeline } from "@/components/design-system/timeline";
+import { ReplayTimeline } from "@/features/replay/components/timeline";
+import { usePlayback } from "@/features/replay/hooks";
+import { useReplayStore } from "@/features/replay/store";
 import { LeftPanel } from "@/components/panels/left-panel";
 import { RightPanel } from "@/components/panels/right-panel";
 import { cn } from "@/lib/utils";
@@ -11,24 +13,50 @@ interface AppShellProps {
   children?: React.ReactNode;
 }
 
-const CURRENT_YEAR = new Date().getFullYear();
-const TIMELINE_YEARS = Array.from({ length: 5 }, (_, i) => ({
-  year: CURRENT_YEAR - 4 + i,
-})).filter((y) => y.year >= 2016 && y.year <= CURRENT_YEAR);
-
 export function AppShell({ children }: AppShellProps) {
-  const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [leftOpen] = useState(true);
   const [rightOpen] = useState(true);
 
-  const handleYearChange = useCallback((year: number) => {
-    setSelectedYear(year);
-  }, []);
+  usePlayback();
 
-  const handlePlayToggle = useCallback(() => {
-    setIsPlaying((prev) => !prev);
-  }, []);
+  const togglePlay = useReplayStore((s) => s.togglePlay);
+  const nextStep = useReplayStore((s) => s.nextStep);
+  const prevStep = useReplayStore((s) => s.prevStep);
+  const jumpToStart = useReplayStore((s) => s.jumpToStart);
+  const jumpToEnd = useReplayStore((s) => s.jumpToEnd);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return;
+
+      switch (e.key) {
+        case " ":
+          e.preventDefault();
+          togglePlay();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          prevStep();
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          nextStep();
+          break;
+        case "Home":
+          e.preventDefault();
+          jumpToStart();
+          break;
+        case "End":
+          e.preventDefault();
+          jumpToEnd();
+          break;
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [togglePlay, nextStep, prevStep, jumpToStart, jumpToEnd]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -37,7 +65,7 @@ export function AppShell({ children }: AppShellProps) {
       <div className="flex-1 pt-16">
         <div
           className={cn(
-            "mx-auto flex h-[calc(100vh-8rem)] w-full max-w-7xl gap-4 px-4 py-4 sm:px-6 lg:px-8",
+            "mx-auto flex h-[calc(100vh-14rem)] w-full max-w-7xl gap-4 px-4 py-4 sm:px-6 lg:px-8",
             "transition-all duration-500"
           )}
         >
@@ -73,13 +101,7 @@ export function AppShell({ children }: AppShellProps) {
 
       <div className="fixed bottom-0 right-0 left-0 z-50 px-4 pb-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <Timeline
-            years={TIMELINE_YEARS}
-            selectedYear={selectedYear}
-            onYearChange={handleYearChange}
-            isPlaying={isPlaying}
-            onPlayToggle={handlePlayToggle}
-          />
+          <ReplayTimeline />
         </div>
       </div>
     </div>
