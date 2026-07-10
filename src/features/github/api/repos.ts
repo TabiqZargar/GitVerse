@@ -8,3 +8,7 @@ export async function fetchUserRepos(username: string) {
 export async function fetchRepoDetails(owner: string, repo: string) {
   return apiClient.get<GitHubRepo>(`/github/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`);
 }
+
+export async function fetchUserRepositories(username: string) {
+  return apiClient.get(`/repositories?username=${encodeURIComponent(username)}`);
+}
