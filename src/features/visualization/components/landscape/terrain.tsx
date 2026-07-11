@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import {
@@ -76,6 +76,13 @@ export function Terrain({
       }),
     []
   );
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
 
   useFrame(() => {
     const mesh = meshRef.current;

@@ -3,6 +3,7 @@
 import { useMemo, useState, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { SceneContainer } from "@/components/design-system/scene-container";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { useUniverseStore } from "../store";
 import { UniverseFilters } from "./universe-filters";
 import { RepositoryInspector } from "./inspector";
@@ -134,18 +135,20 @@ export function RepositoryUniverse({ bodies, isLoading, className }: RepositoryU
       </div>
 
       <div className="h-full w-full">
-        <LazyCanvas
-          camera={{ position: [0, 8, 16], fov: 50, near: 0.1, far: 100 }}
-          gl={{
-            antialias: true,
-            toneMapping: 3,
-            toneMappingExposure: 1.0,
-            outputColorSpace: "srgb",
-          }}
-          dpr={[1, 2]}
-        >
-          <SceneInner bodies={bodies} reducedMotion={reducedMotion} />
-        </LazyCanvas>
+        <ErrorBoundary>
+          <LazyCanvas
+            camera={{ position: [0, 8, 16], fov: 50, near: 0.1, far: 100 }}
+            gl={{
+              antialias: true,
+              toneMapping: 3,
+              toneMappingExposure: 1.0,
+              outputColorSpace: "srgb",
+            }}
+            dpr={[1, 2]}
+          >
+            <SceneInner bodies={bodies} reducedMotion={reducedMotion} />
+          </LazyCanvas>
+        </ErrorBoundary>
       </div>
     </SceneContainer>
   );

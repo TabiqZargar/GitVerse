@@ -17,6 +17,7 @@
 import { NextRequest } from "next/server";
 import { createServices, getGitHubToken } from "@/features/github/services";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
+import { refreshQuerySchema, safeParseQuery } from "@/lib/api-query-schemas";
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     const services = createServices(token);
 
     const { searchParams } = new URL(request.url);
-    const forceRefresh = searchParams.get("refresh") === "true";
+    const { refresh: forceRefresh } = safeParseQuery(refreshQuerySchema, searchParams);
 
     const repos = await services.repository.getRepositories(forceRefresh);
 

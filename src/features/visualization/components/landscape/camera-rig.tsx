@@ -1,10 +1,12 @@
 "use client";
 
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useRef, useEffect } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsType } from "three-stdlib";
+import * as THREE from "three";
 import {
+  CAMERA_DEFAULT,
   CAMERA_IDLE_SPEED,
   CAMERA_ZOOM_MIN,
   CAMERA_ZOOM_MAX,
@@ -18,7 +20,53 @@ interface CameraRigProps {
 
 export function CameraRig({ reducedMotion = false }: CameraRigProps) {
   const controlsRef = useRef<OrbitControlsType>(null);
+  const { camera } = useThree();
   const idleAngle = useRef(0);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+
+    const defaultPos = new THREE.Vector3(...CAMERA_DEFAULT);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "r":
+        case "R":
+          controls.target.set(0, 0, 0);
+          camera.position.copy(defaultPos);
+          controls.update();
+          break;
+        case "+":
+        case "=":
+          camera.position.multiplyScalar(1 / 1.1);
+          controls.update();
+          break;
+        case "-":
+        case "_":
+          camera.position.multiplyScalar(1.1);
+          controls.update();
+          break;
+        case "ArrowLeft": {
+          controls.target.set(0, 0, 0);
+          const leftPos = camera.position.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.1);
+          camera.position.copy(leftPos);
+          controls.update();
+          break;
+        }
+        case "ArrowRight": {
+          controls.target.set(0, 0, 0);
+          const rightPos = camera.position.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), -0.1);
+          camera.position.copy(rightPos);
+          controls.update();
+          break;
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [camera]);
 
   useFrame((_, delta) => {
     const controls = controlsRef.current;

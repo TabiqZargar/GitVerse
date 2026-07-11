@@ -18,6 +18,7 @@
 import { NextRequest } from "next/server";
 import { createServices, getGitHubToken } from "@/features/github/services";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
+import { usernameYearSchema, safeParseQuery } from "@/lib/api-query-schemas";
 
 export async function GET(request: NextRequest) {
   try {
@@ -25,10 +26,7 @@ export async function GET(request: NextRequest) {
     const services = createServices(token);
 
     const { searchParams } = new URL(request.url);
-    const username = searchParams.get("username");
-    const yearParam = searchParams.get("year");
-
-    const year = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
+    const { username, year } = safeParseQuery(usernameYearSchema, searchParams);
     const login = username ?? (await services.user.getProfile()).login;
 
     const contributions = await services.contribution.getContributions(login, year);

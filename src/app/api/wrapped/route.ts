@@ -3,6 +3,7 @@ import { createServices, getGitHubToken } from "@/features/github/services";
 import { auth } from "@/lib/auth";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { computeDeveloperSummary } from "@/features/analytics/services/summary.service";
+import { currentDateOnlySchema, safeParseQuery } from "@/lib/api-query-schemas";
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     const services = createServices(token);
 
     const { searchParams } = new URL(request.url);
-    const currentDate = searchParams.get("currentDate") ?? undefined;
+    const { currentDate } = safeParseQuery(currentDateOnlySchema, searchParams);
 
     const profile = await services.user.getProfile();
     const year = currentDate

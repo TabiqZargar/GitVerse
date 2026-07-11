@@ -3,8 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export function TopNav() {
+  const { user } = useAuth();
+
   return (
     <motion.nav 
       initial={{ y: -20, opacity: 0 }}
@@ -21,9 +24,21 @@ export function TopNav() {
       </div>
       <div className="flex items-center gap-unit-md">
         <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} className="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer" aria-label="Notifications">notifications</motion.button>
-          <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
-            <Image src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2vDjGouC4n1coSVtqrkX_lLMi2XTPNItxqy4H0O1VQOm6H3tY1K5ardRFyafipyks8vXPLu5xQGjJaKIdU8qZ3PFN_J9DCQtB0vA7eCvWBn0qdCvLVMMdpzviziGTPq7FGE7W1AmyUeG3Y9BXAR7MRXGtpSANlgyW6VET7ezqK7DXhXc20Vdnr7o5MKL3nw-YEOAQsEokMc0X2VI1aq7VB-nG_qX2yFVKLdkJTpDHtS5xdWTGQ_pm_-2tJEwCz2WGZSwASQWA9LA" alt="Profile" width={32} height={32} className="w-full h-full object-cover" />
-          </div>
+        <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center overflow-hidden">
+          {user?.image ? (
+            <Image
+              src={user.image}
+              alt={user.name ?? "Profile"}
+              width={32}
+              height={32}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-xs font-medium text-primary">
+              {user?.name?.charAt(0) ?? "?"}
+            </span>
+          )}
+        </div>
       </div>
     </motion.nav>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { PARTICLE_COUNT } from "./utils";
@@ -14,7 +14,7 @@ export function Particles({ reducedMotion = false }: ParticlesProps) {
   const startTime = useRef(0);
   const initialized = useRef(false);
 
-  const positions = new Float32Array(PARTICLE_COUNT * 3);
+  const positions = useMemo(() => new Float32Array(PARTICLE_COUNT * 3), []);
   const velocitiesRef = useRef(new Float32Array(PARTICLE_COUNT));
 
   useFrame((_, delta) => {

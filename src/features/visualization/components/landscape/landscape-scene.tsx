@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { SceneContainer } from "@/components/design-system/scene-container";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { Tooltip } from "./tooltip";
-import { LandscapeControls } from "./landscape-controls";
 import { buildTerrainGrid } from "./utils";
 import type { TileData } from "./types";
 
@@ -53,12 +53,6 @@ export function LandscapeScene({ days, isLoading, className, currentDate }: Land
 
   const grid = useMemo(() => (days ? buildTerrainGrid(days) : null), [days]);
 
-  const handleResetView = useCallback(() => {}, []);
-  const handleZoomIn = useCallback(() => {}, []);
-  const handleZoomOut = useCallback(() => {}, []);
-  const handleRotateLeft = useCallback(() => {}, []);
-  const handleRotateRight = useCallback(() => {}, []);
-
   return (
     <SceneContainer
       className={className}
@@ -66,14 +60,6 @@ export function LandscapeScene({ days, isLoading, className, currentDate }: Land
       loadingOverlay={<LoadingFallback />}
       label="3D Contribution Landscape"
     >
-      <LandscapeControls
-        onResetView={handleResetView}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onRotateLeft={handleRotateLeft}
-        onRotateRight={handleRotateRight}
-        reducedMotion={reducedMotion}
-      />
 
       <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
         <button
@@ -91,7 +77,8 @@ export function LandscapeScene({ days, isLoading, className, currentDate }: Land
 
       <Suspense fallback={<LoadingFallback />}>
         <div className="h-full w-full">
-          <LazyCanvas
+          <ErrorBoundary>
+            <LazyCanvas
             camera={{ position: [0, 6, 10], fov: 45, near: 0.1, far: 50 }}
             shadows
             gl={{
@@ -116,6 +103,7 @@ export function LandscapeScene({ days, isLoading, className, currentDate }: Land
             )}
             <ParticlesComponent reducedMotion={reducedMotion} />
           </LazyCanvas>
+          </ErrorBoundary>
         </div>
       </Suspense>
     </SceneContainer>

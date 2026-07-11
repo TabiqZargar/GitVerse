@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 import {
   GlassPanel,
   GlassPanelContent,
@@ -17,7 +19,30 @@ interface LeftPanelProps {
 }
 
 export function LeftPanel({ className }: LeftPanelProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+
+  const { data: analytics } = useQuery({
+    queryKey: ["analytics", "left-panel"],
+    queryFn: async () => {
+      const res = await apiClient.get<{
+        data: {
+          streaks: { currentStreak: number; longestStreak: number };
+          statistics: { totalContributions: number; totalActiveDays: number; weeklyAverage: number };
+          language: { diversity: number; languages: { name: string; percentage: number }[]; primaryLanguage: { name: string; percentage: number } | null };
+          scores: { developer: { overall: number; level: string } };
+        };
+      }>("/analytics");
+      if (!res.success) throw new Error(res.error.message);
+      return res.data.data;
+    },
+    enabled: isAuthenticated,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const streak = analytics?.streaks;
+  const stats = analytics?.statistics;
+  const lang = analytics?.language;
+  const score = analytics?.scores?.developer;
 
   return (
     <aside
@@ -49,12 +74,12 @@ export function LeftPanel({ className }: LeftPanelProps) {
             </GlassPanelHeader>
             <GlassPanelContent className="pt-0">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold tracking-tight">0</span>
+                <span className="text-3xl font-bold tracking-tight">{streak?.currentStreak ?? 0}</span>
                 <span className="text-muted-foreground text-sm">days</span>
               </div>
               <div className="mt-2 flex gap-2">
-                <StatBadge label="longest" value="0" color="primary" />
-                <StatBadge label="total" value="0" />
+                <StatBadge label="longest" value={String(streak?.longestStreak ?? 0)} color="primary" />
+                <StatBadge label="active days" value={String(stats?.totalActiveDays ?? 0)} />
               </div>
             </GlassPanelContent>
           </GlassPanelMotion>
@@ -65,13 +90,14 @@ export function LeftPanel({ className }: LeftPanelProps) {
             </GlassPanelHeader>
             <GlassPanelContent className="space-y-3 pt-0">
               <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold tracking-tight">0</span>
+                <span className="text-3xl font-bold tracking-tight">{stats?.totalContributions ?? 0}</span>
                 <span className="text-muted-foreground text-sm">this year</span>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <StatBadge label="this week" value="0" />
-                <StatBadge label="today" value="0" />
-              </div>
+              {stats && (
+                <div className="flex flex-wrap gap-2">
+                  <StatBadge label="weekly avg" value={String(stats.weeklyAverage)} />
+                </div>
+              )}
             </GlassPanelContent>
           </GlassPanelMotion>
 
@@ -80,12 +106,37 @@ export function LeftPanel({ className }: LeftPanelProps) {
               <SectionHeader title="Languages" />
             </GlassPanelHeader>
             <GlassPanelContent className="space-y-2.5 pt-0">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">No data yet</span>
-              </div>
-              <div className="flex h-1.5 gap-0.5 overflow-hidden rounded-full">
-                <div className="h-full w-full rounded-full bg-muted" />
-              </div>
+              {lang && lang.languages.length > 0 ? (
+                <>
+                  {lang.languages.slice(0, 4).map((l) => (
+                    <div key={l.name} className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground truncate">{l.name}</span>
+                      <span className="text-foreground font-medium">{Math.round(l.percentage)}%</span>
+                    </div>
+                  ))}
+                  <div className="flex h-1.5 gap-0.5 overflow-hidden rounded-full">
+                    {lang.languages.slice(0, 5).map((l, i) => (
+                      <div
+                        key={l.name}
+                        className="h-full rounded-full first:rounded-l-full last:rounded-r-full"
+                        style={{
+                          width: `${Math.max(l.percentage, 2)}%`,
+                          backgroundColor: `hsl(${i * 50 + 200}, 70%, 55%)`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">No data yet</span>
+                </div>
+              )}
+              {lang && lang.primaryLanguage && (
+                <p className="text-xs text-muted-foreground">
+                  Primary: {lang.primaryLanguage.name} ({Math.round(lang.primaryLanguage.percentage)}%)
+                </p>
+              )}
             </GlassPanelContent>
           </GlassPanelMotion>
 
@@ -94,13 +145,27 @@ export function LeftPanel({ className }: LeftPanelProps) {
               <SectionHeader title="Developer Score" />
             </GlassPanelHeader>
             <GlassPanelContent className="pt-0">
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-bold tracking-tight">&mdash;</span>
-                <span className="text-muted-foreground text-sm">/ 100</span>
-              </div>
-              <p className="text-muted-foreground mt-1 text-xs">
-                Score will appear once data is collected
-              </p>
+              {score ? (
+                <>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-bold tracking-tight">{score.overall}</span>
+                    <span className="text-muted-foreground text-sm">/ 100</span>
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Grade: {score.level}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-3xl font-bold tracking-tight">&mdash;</span>
+                    <span className="text-muted-foreground text-sm">/ 100</span>
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Score will appear once data is collected
+                  </p>
+                </>
+              )}
             </GlassPanelContent>
           </GlassPanelMotion>
 
@@ -109,13 +174,19 @@ export function LeftPanel({ className }: LeftPanelProps) {
               <SectionHeader title="Recent Activity" />
             </GlassPanelHeader>
             <GlassPanelContent className="pt-0">
-              <p className="text-muted-foreground py-6 text-center text-xs">
-                Connect your GitHub account to see activity
-              </p>
+              {stats && stats.totalContributions > 0 ? (
+                <p className="text-muted-foreground py-6 text-center text-xs">
+                  {stats.totalContributions} contributions across {stats.totalActiveDays} active days
+                </p>
+              ) : (
+                <p className="text-muted-foreground py-6 text-center text-xs">
+                  Connect your GitHub account to see activity
+                </p>
+              )}
             </GlassPanelContent>
           </GlassPanelMotion>
         </>
-      ) : isLoading ? (
+      ) : authLoading ? (
         <GlassPanel>
           <GlassPanelContent className="flex items-center justify-center py-12">
             <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" role="status" aria-label="Loading profile" />

@@ -3,6 +3,7 @@
 import { useEffect, Suspense, lazy, useMemo } from "react";
 import type { GitHubDay } from "@/features/github/types";
 import { SceneContainer } from "@/components/design-system/scene-container";
+import { ErrorBoundary } from "@/components/shared/error-boundary";
 import { GalaxyRenderer } from "./galaxy-renderer";
 import { GalaxyCamera } from "./galaxy-camera";
 import { GalaxyLighting } from "./galaxy-lighting";
@@ -51,22 +52,24 @@ export function ContributionGalaxy({
             </div>
           }
         >
-          <LazyCanvas
-            camera={{ position: [0, 5, 14], fov: 50, near: 0.1, far: 50 }}
-            gl={{
-              antialias: !reducedMotion,
-              alpha: false,
-              powerPreference: "high-performance",
-            }}
-            dpr={[1, reducedMotion ? 1 : 1.5]}
-          >
-            <GalaxyLighting />
-            <GalaxyCamera reducedMotion={reducedMotion} />
-            <GalaxyRenderer
-              particles={particles}
-              reducedMotion={reducedMotion}
-            />
-          </LazyCanvas>
+          <ErrorBoundary>
+            <LazyCanvas
+              camera={{ position: [0, 5, 14], fov: 50, near: 0.1, far: 50 }}
+              gl={{
+                antialias: !reducedMotion,
+                alpha: false,
+                powerPreference: "high-performance",
+              }}
+              dpr={[1, reducedMotion ? 1 : 1.5]}
+            >
+              <GalaxyLighting />
+              <GalaxyCamera reducedMotion={reducedMotion} />
+              <GalaxyRenderer
+                particles={particles}
+                reducedMotion={reducedMotion}
+              />
+            </LazyCanvas>
+          </ErrorBoundary>
         </Suspense>
       </div>
 

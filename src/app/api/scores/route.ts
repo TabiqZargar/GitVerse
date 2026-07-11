@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createServices, getGitHubToken } from "@/features/github/services";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { computeDeveloperSummary } from "@/features/analytics/services/summary.service";
+import { yearQuerySchema, safeParseQuery } from "@/lib/api-query-schemas";
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,11 +10,9 @@ export async function GET(request: NextRequest) {
     const services = createServices(token);
 
     const { searchParams } = new URL(request.url);
-    const currentDate = searchParams.get("currentDate") ?? undefined;
-    const yearParam = searchParams.get("year");
+    const { currentDate, year } = safeParseQuery(yearQuerySchema, searchParams);
 
     const profile = await services.user.getProfile();
-    const year = yearParam ? parseInt(yearParam, 10) : new Date().getFullYear();
 
     const [contributions, repos] = await Promise.all([
       services.contribution.getContributions(profile.login, year),

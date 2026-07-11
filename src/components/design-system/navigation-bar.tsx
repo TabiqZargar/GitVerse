@@ -28,6 +28,43 @@ export function NavigationBar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const nav = document.getElementById("mobile-nav");
+    if (!nav) return;
+
+    const focusable = nav.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+
+    if (focusable.length === 0) return;
+
+    const first = focusable[0]!;
+    const last = focusable[focusable.length - 1]!;
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    first.focus();
+
+    window.addEventListener("keydown", handleTab);
+    return () => window.removeEventListener("keydown", handleTab);
+  }, [mobileOpen]);
+
   return (
     <header
       className={cn(
@@ -126,6 +163,7 @@ export function NavigationBar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            id="mobile-nav"
             className="border-t border-glass-border bg-background/95 backdrop-blur-2xl md:hidden overflow-hidden"
             role="navigation"
             aria-label="Mobile navigation"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { CelestialBody } from "../types";
@@ -103,6 +103,17 @@ export function Planet({
 
   const sphereGeo = useMemo(() => new THREE.SphereGeometry(body.size, 32, 32), [body.size]);
   const atmosphereGeo = useMemo(() => new THREE.SphereGeometry(body.size * 1.12, 24, 24), [body.size]);
+
+  useEffect(() => {
+    return () => {
+      sphereGeo.dispose();
+      atmosphereGeo.dispose();
+      ringGeo.dispose();
+      mat.dispose();
+      atmosphereMat.dispose();
+      ringMat.dispose();
+    };
+  }, [sphereGeo, atmosphereGeo, ringGeo, mat, atmosphereMat, ringMat]);
 
   const handleClick = useCallback(() => onClick(body.id), [onClick, body.id]);
   const handleDoubleClick = useCallback(() => onDoubleClick(body.id), [onDoubleClick, body.id]);
