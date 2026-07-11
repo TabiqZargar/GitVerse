@@ -82,8 +82,12 @@ export function SearchBar({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setSelectedIndex((i) => Math.max(i - 1, -1));
-    } else if (e.key === "Enter" && selectedIndex >= 0 && results[selectedIndex]) {
-      handleSelect(results[selectedIndex].username);
+    } else if (e.key === "Enter") {
+      if (selectedIndex >= 0 && results[selectedIndex]) {
+        handleSelect(results[selectedIndex].username);
+      } else if (query.trim()) {
+        handleSelect(query.trim());
+      }
     } else if (e.key === "Escape") {
       setResults([]);
       inputRef.current?.blur();

@@ -7,7 +7,7 @@ export function LandingSearch() {
   const router = useRouter();
 
   const handleNavigate = (username: string) => {
-    router.push(`/u/${encodeURIComponent(username)}`);
+    router.push(`/dashboard?username=${encodeURIComponent(username)}`);
   };
 
   return (

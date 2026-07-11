@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useProfileStore } from "@/features/profile/store/profile-store";
 
 const navItems = [
   { label: "Command Center", icon: "dashboard", href: "/dashboard" },
@@ -17,6 +18,14 @@ const navItems = [
 
 export function SideNav() {
   const pathname = usePathname();
+  const activeUsername = useProfileStore((s) => s.activeUsername);
+
+  const getHref = (href: string) => {
+    if (!activeUsername) return href;
+    // For dashboard, we want the base path
+    if (href === "/dashboard") return href; 
+    return `${href}?username=${encodeURIComponent(activeUsername)}`;
+  };
 
   return (
     <motion.aside
@@ -37,9 +46,9 @@ export function SideNav() {
             {navItems.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
               return (
-                <Link
+                  <Link
                   key={item.href}
-                  href={item.href}
+                  href={getHref(item.href)}
                   className={cn(
                     "flex items-center gap-3 px-3 xl:px-4 py-3 rounded-xl transition-all duration-300 group relative",
                     isActive
