@@ -7,21 +7,24 @@ import type { Repository } from "@/features/github/types/domain";
 import { adaptReposToBodies } from "../data-adapter";
 import type { CelestialBody } from "../types";
 
-export function useUniverseData(): {
+export function useUniverseData(username?: string): {
   bodies: CelestialBody[] | undefined;
   isLoading: boolean;
 } {
   const { user } = useAuth();
-  const username = user?.name ?? undefined;
+  const activeUser = username ?? user?.name ?? undefined;
 
   const { data: repos, isLoading } = useQuery({
-    queryKey: ["universe", "repos", username],
+    queryKey: ["universe", "repos", activeUser],
     queryFn: async () => {
-      const res = await fetch("/api/repositories");
+      const endpoint = activeUser
+        ? `/api/repositories?username=${encodeURIComponent(activeUser)}`
+        : "/api/repositories";
+      const res = await fetch(endpoint);
       const json: { data: Repository[] } = await res.json();
       return json.data;
     },
-    enabled: !!username,
+    enabled: !!activeUser,
     staleTime: 5 * 60 * 1000,
   });
 

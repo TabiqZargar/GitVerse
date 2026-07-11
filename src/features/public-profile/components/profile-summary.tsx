@@ -1,25 +1,26 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ProfileData } from "@/features/export/types";
+import type { ProfileData } from "@/features/profile/types";
+
 interface ProfileSummaryProps {
-  stats: ProfileData["stats"];
+  profile: ProfileData;
 }
 
 const statItems = [
-  { key: "totalContributions", label: "Contributions", suffix: "" },
-  { key: "totalRepos", label: "Repositories", suffix: "" },
-  { key: "totalStars", label: "Stars", suffix: "" },
-  { key: "longestStreak", label: "Longest Streak", suffix: " days" },
-  { key: "currentStreak", label: "Current Streak", suffix: " days" },
-  { key: "languagesCount", label: "Languages", suffix: "" },
-] as const;
+  { key: "publicRepos", label: "Repositories", suffix: "", getValue: (p: ProfileData) => p.publicRepos },
+  { key: "totalStars", label: "Stars", suffix: "", getValue: (p: ProfileData) => p.totalStars },
+  { key: "followers", label: "Followers", suffix: "", getValue: (p: ProfileData) => p.followers },
+  { key: "following", label: "Following", suffix: "", getValue: (p: ProfileData) => p.following },
+  { key: "totalCommits", label: "Commits", suffix: "", getValue: (p: ProfileData) => p.totalCommits },
+  { key: "languages", label: "Languages", suffix: "", getValue: (p: ProfileData) => p.languages.length },
+];
 
-export function ProfileSummary({ stats }: ProfileSummaryProps) {
+export function ProfileSummary({ profile }: ProfileSummaryProps) {
   return (
     <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
       {statItems.map((item, i) => {
-        const val = stats[item.key];
+        const val = item.getValue(profile);
         return (
           <motion.div
             key={item.key}

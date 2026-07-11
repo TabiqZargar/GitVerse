@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ProfileData } from "@/features/export/types";
+import type { ProfileRepo } from "@/features/profile/types";
+
 interface ProfileReposProps {
-  repos: ProfileData["topRepos"];
+  repos: ProfileRepo[];
 }
 
 export function ProfileRepos({ repos }: ProfileReposProps) {

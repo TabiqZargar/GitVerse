@@ -13,7 +13,11 @@ import { generatePredictions } from "../services/predictions.service";
 import { generateRecommendations } from "../services/recommendations.service";
 import type { DeveloperSummary } from "@/features/analytics/types";
 
-export function WrappedEngine() {
+interface WrappedEngineProps {
+  username?: string;
+}
+
+export function WrappedEngine({ username }: WrappedEngineProps) {
   const setNarrative = useWrappedStore((s) => s.setNarrative);
   const setPredictions = useWrappedStore((s) => s.setPredictions);
   const setRecommendations = useWrappedStore((s) => s.setRecommendations);
@@ -27,11 +31,12 @@ export function WrappedEngine() {
     isLoading: analyticsLoading,
     error: analyticsError,
   } = useQuery({
-    queryKey: ["wrapped", "analytics"],
+    queryKey: ["wrapped", "analytics", username],
     queryFn: async () => {
-      const res = await apiClient.get<{ data: DeveloperSummary; username: string }>(
-        "/wrapped"
-      );
+      const endpoint = username
+        ? `/wrapped?username=${encodeURIComponent(username)}`
+        : "/wrapped";
+      const res = await apiClient.get<{ data: DeveloperSummary; username: string }>(endpoint);
       if (!res.success) throw new Error(res.error.message);
       return res.data;
     },
@@ -50,12 +55,12 @@ export function WrappedEngine() {
     if (!analyticsData) return;
 
     const summary = analyticsData.data;
-    const username = analyticsData.username;
+    const activeUsername = analyticsData.username;
 
     setAnalytics(summary);
     setLoadingNarrative(true);
 
-    const narrative = generateFallbackNarrative(username);
+    const narrative = generateFallbackNarrative(activeUsername);
     const predictions = generatePredictions(summary);
     const recommendations = generateRecommendations(summary);
 

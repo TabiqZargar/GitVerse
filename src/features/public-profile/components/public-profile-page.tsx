@@ -1,32 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
+import { useProfileStore } from "@/features/profile/store/profile-store";
 import { ProfileHero } from "./profile-hero";
 import { ProfileSummary } from "./profile-summary";
 import { ProfileRepos } from "./profile-repos";
 import { ProfileAchievements } from "./profile-achievements";
 import { ProfileScore } from "./profile-score";
 import { ProfileWrapped } from "./profile-wrapped";
-import type { ProfileData } from "@/features/export/types";
 
 interface PublicProfilePageProps {
   username: string;
 }
 
 export function PublicProfilePage({ username }: PublicProfilePageProps) {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["public-profile", username],
-    queryFn: async () => {
-      const res = await apiClient.get<{ data: ProfileData }>(
-        `/profile/${encodeURIComponent(username)}`
-      );
-      if (!res.success) throw new Error(res.error.message);
-      return res.data.data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
+  const { profile, isLoading, error, fetchProfile } = useProfileStore();
+
+  useEffect(() => {
+    fetchProfile(username);
+  }, [username, fetchProfile]);
 
   if (isLoading) {
     return (
@@ -39,7 +32,7 @@ export function PublicProfilePage({ username }: PublicProfilePageProps) {
     );
   }
 
-  if (error || !data) {
+  if (error || !profile) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-center">
@@ -47,9 +40,7 @@ export function PublicProfilePage({ username }: PublicProfilePageProps) {
           <p className="text-sm text-muted-foreground">
             This user does not exist or has no public data.
           </p>
-          <Link href="/" className="text-sm text-chart-1 hover:underline">
-            Go home
-          </Link>
+          <Link href="/" className="text-sm text-chart-1 hover:underline">Go home</Link>
         </div>
       </div>
     );
@@ -57,12 +48,12 @@ export function PublicProfilePage({ username }: PublicProfilePageProps) {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-8">
-      <ProfileHero profile={data} />
-      <ProfileSummary stats={data.stats} />
-      <ProfileScore score={data.stats.developerScore} grade={data.stats.developerGrade} />
-      <ProfileRepos repos={data.topRepos} />
-      <ProfileAchievements achievements={data.achievements} />
-      <ProfileWrapped username={username} />
+      <ProfileHero profile={profile} />
+      <ProfileSummary profile={profile} />
+      <ProfileScore profile={profile} />
+      <ProfileRepos repos={profile.pinnedRepositories} />
+      <ProfileAchievements />
+      <ProfileWrapped username={profile.username} />
     </div>
   );
 }

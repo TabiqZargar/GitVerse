@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import type { ProfileData } from "@/features/export/types";
+import type { ProfileData } from "@/features/profile/types";
 
 interface ProfileHeroProps {
   profile: ProfileData;
