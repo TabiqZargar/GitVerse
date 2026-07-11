@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <TopNav />
       <div className="flex">
         <SideNav />
-        <main id="main-content" className="flex-1 pt-[100px] xl:pl-64">
+        <main id="main-content" tabIndex={-1} className="flex-1 pt-[100px] xl:pl-64 outline-none">
           {children}
         </main>
       </div>

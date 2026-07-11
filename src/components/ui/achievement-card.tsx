@@ -7,7 +7,7 @@ interface AchievementCardProps {
   title: string;
   date?: string;
   icon: string;
-  rarity: "common" | "rare" | "epic" | "legendary";
+  rarity: "common" | "rare" | "epic" | "legendary" | "mythic";
   locked?: boolean;
   progress?: number;
 }

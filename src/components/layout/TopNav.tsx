@@ -17,8 +17,8 @@ export function TopNav() {
       <div className="flex items-center gap-unit-md">
         <Link href="/" className="font-headline-sm text-headline-sm font-bold tracking-tighter text-on-surface hover:text-primary transition-colors">GitVerse</Link>
         <div className="hidden md:flex gap-unit-lg ml-unit-xl">
-          <Link href="/explore" className="text-on-surface-variant font-medium hover:text-primary transition-all duration-300">Explore</Link>
-          <Link href="/universe" className="text-primary font-bold border-b-2 border-primary pb-1" aria-current="page">Universe</Link>
+          <Link href="/dashboard" className="text-on-surface-variant font-medium hover:text-primary transition-all duration-300">Dashboard</Link>
+          <Link href="/achievements" className="text-on-surface-variant font-medium hover:text-primary transition-all duration-300">Achievements</Link>
           <Link href="/wrapped" className="text-on-surface-variant font-medium hover:text-primary transition-all duration-300">Wrapped</Link>
         </div>
       </div>

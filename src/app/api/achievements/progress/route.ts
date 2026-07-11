@@ -1,6 +1,7 @@
 import { createServices, getGitHubToken } from "@/features/github/services";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { computeDeveloperSummary } from "@/features/analytics/services/summary.service";
+import { evaluateAchievements } from "@/features/achievements/engine/achievement-engine";
 import { getUpcomingAchievements } from "@/features/achievements/engine/progress-tracker";
 
 export async function GET() {
@@ -24,7 +25,11 @@ export async function GET() {
     );
 
     const summary = computeDeveloperSummary({ days, repositories: repos });
+    const { evaluations } = evaluateAchievements(summary, new Map());
     const allUnlocked = new Set<string>();
+    for (const [id, ev] of evaluations) {
+      if (ev.unlocked) allUnlocked.add(id);
+    }
     const upcoming = getUpcomingAchievements(summary, allUnlocked, 6);
 
     return apiSuccessResponse(upcoming.map((u) => ({

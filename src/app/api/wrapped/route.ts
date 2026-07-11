@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
     if (!prompt) {
       return NextResponse.json(
-        { error: { code: "MISSING_PROMPT", message: "Prompt is required" } },
+        { code: "MISSING_PROMPT", message: "Prompt is required", status: 400 },
         { status: 400 }
       );
     }
@@ -99,13 +99,10 @@ export async function POST(request: NextRequest) {
         throw new Error("Failed to parse LLM response as JSON");
       }
 
-      return NextResponse.json({ narrative });
+      return apiSuccessResponse({ narrative });
     }
 
-    return NextResponse.json(
-      { narrative: null },
-      { status: 503, statusText: "Narrative generation not configured" }
-    );
+    return apiErrorResponse(new Error("Narrative generation is not configured"));
   } catch (error) {
     return apiErrorResponse(error);
   }

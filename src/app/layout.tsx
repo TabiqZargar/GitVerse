@@ -8,8 +8,23 @@ const inter = Inter({ subsets: ["latin"] });
 
 
 export const metadata: Metadata = {
-  title: "GitVerse",
+  metadataBase: new URL("https://gitverse.dev"),
+  title: {
+    default: "GitVerse",
+    template: "%s | GitVerse",
+  },
   description: "Visualize your GitHub contributions in a whole new dimension",
+  openGraph: {
+    title: "GitVerse",
+    description: "Visualize your GitHub contributions in a whole new dimension",
+    type: "website",
+    siteName: "GitVerse",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GitVerse",
+    description: "Visualize your GitHub contributions in a whole new dimension",
+  },
 };
 
 export default function RootLayout({

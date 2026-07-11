@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import { useGalaxyStore } from "../store";
-import type { GalaxyParticle } from "../types";
 
 const LANGUAGE_COLORS: Record<string, [number, number, number]> = {
   TypeScript: [0.19, 0.47, 0.78],

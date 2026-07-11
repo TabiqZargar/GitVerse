@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 interface AnimatedCounterProps {
@@ -12,6 +12,7 @@ interface AnimatedCounterProps {
 
 export function AnimatedCounter({ from = 0, to, duration = 2, className }: AnimatedCounterProps) {
   const [count, setCount] = useState(from);
+  const rafRef = useRef<number | null>(null);
 
   useEffect(() => {
     const startTime = Date.now();
@@ -24,11 +25,15 @@ export function AnimatedCounter({ from = 0, to, duration = 2, className }: Anima
       setCount(Math.round(from + difference * eased));
 
       if (progress < 1) {
-        requestAnimationFrame(tick);
+        rafRef.current = requestAnimationFrame(tick);
       }
     };
 
-    requestAnimationFrame(tick);
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, [from, to, duration]);
 
   return (

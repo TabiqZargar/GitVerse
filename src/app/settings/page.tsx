@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 
 export default function SettingsPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("appearance");
 
   return (
@@ -50,6 +53,22 @@ export default function SettingsPage() {
                     <button className="p-2 rounded-full text-on-surface-variant">Light</button>
                     <button className="p-2 rounded-full bg-primary text-on-primary shadow-lg">Dark</button>
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === "github" && (
+            <div className="flex flex-col gap-unit-xl">
+              <header>
+                <h2 className="font-headline-lg text-headline-lg text-on-surface mb-2">GitHub Connection</h2>
+                <p className="text-on-surface-variant font-body-sm">Manage your GitHub account connection and permissions.</p>
+              </header>
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                <p className="text-on-surface-variant text-sm mb-2">Connected as <strong className="text-on-surface">{user?.name ?? "GitHub user"}</strong></p>
+                <p className="text-on-surface-variant text-xs">Your OAuth token is managed by Auth.js. Re-authenticate below if needed.</p>
+                <div className="mt-unit-lg flex gap-unit-md">
+                  <Link href="/api/auth/signin" className="px-4 py-2 rounded-xl bg-primary/10 text-primary font-label-mono uppercase hover:bg-primary hover:text-on-primary transition-all">Reconnect</Link>
+                  <Link href="/api/auth/signout" className="px-4 py-2 rounded-xl bg-white/5 text-on-surface-variant font-label-mono uppercase hover:bg-white/10 transition-all">Disconnect</Link>
                 </div>
               </div>
             </div>

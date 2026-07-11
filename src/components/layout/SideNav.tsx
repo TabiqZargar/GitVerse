@@ -19,8 +19,8 @@ export function SideNav() {
           <nav className="space-y-1" aria-label="Main navigation">
             {[
               { label: "Command Center", icon: "dashboard", href: "/dashboard" },
-              { label: "Landscape", icon: "terrain", href: "/landscape" },
-              { label: "Universe", icon: "public", href: "/universe" },
+              { label: "Visualization", icon: "public", href: "/dashboard/visualization" },
+              { label: "Analytics", icon: "analytics", href: "/dashboard/analytics" },
               { label: "Achievements", icon: "military_tech", href: "/achievements" },
               { label: "Settings", icon: "settings", href: "/settings" },
             ].map((item) => (

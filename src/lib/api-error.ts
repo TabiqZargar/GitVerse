@@ -5,6 +5,7 @@
 
 import { NextResponse } from "next/server";
 import { GitHubError } from "@/features/github/errors";
+import { ZodError } from "zod";
 
 interface ErrorBody {
   code: string;
@@ -20,6 +21,15 @@ export function apiErrorResponse(error: unknown): NextResponse {
       status: error.status,
     };
     return NextResponse.json(body, { status: error.status });
+  }
+
+  if (error instanceof ZodError) {
+    const body: ErrorBody = {
+      code: "VALIDATION_ERROR",
+      message: error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join("; "),
+      status: 400,
+    };
+    return NextResponse.json(body, { status: 400 });
   }
 
   if (error instanceof Error) {

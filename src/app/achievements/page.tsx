@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useAchievements } from "@/features/achievements/hooks/use-achievements";
 import { useAchievementStore } from "@/features/achievements/store";
 import { AchievementCard } from "@/components/ui/achievement-card";

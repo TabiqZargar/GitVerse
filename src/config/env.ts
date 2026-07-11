@@ -11,6 +11,7 @@ const envSchema = z.object({
   NARRATIVE_API_URL: z.string().url().optional(),
   NARRATIVE_API_KEY: z.string().min(1).optional(),
   NARRATIVE_MODEL: z.string().default("gpt-4"),
+  AUTH_GITHUB_TOKEN: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse({
@@ -24,6 +25,7 @@ const parsed = envSchema.safeParse({
   NARRATIVE_API_URL: process.env.NARRATIVE_API_URL,
   NARRATIVE_API_KEY: process.env.NARRATIVE_API_KEY,
   NARRATIVE_MODEL: process.env.NARRATIVE_MODEL,
+  AUTH_GITHUB_TOKEN: process.env.AUTH_GITHUB_TOKEN,
 });
 
 if (!parsed.success) {

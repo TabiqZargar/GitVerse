@@ -20,6 +20,7 @@ export function UniverseCamera({ reducedMotion = false }: { reducedMotion?: bool
   const isIdle = useRef(false);
   const targetPosition = useRef<THREE.Vector3 | null>(null);
   const initializing = useRef(true);
+  const dirVec = useRef(new THREE.Vector3());
   const { camera } = useThree();
 
   const handleStart = useCallback(() => {
@@ -52,7 +53,7 @@ export function UniverseCamera({ reducedMotion = false }: { reducedMotion?: bool
       const target = targetPosition.current;
       const distance = camera.position.distanceTo(target);
       if (distance > 0.05) {
-        const dir = new THREE.Vector3().copy(target).sub(camera.position).normalize();
+        const dir = dirVec.current.copy(target).sub(camera.position).normalize();
         const speed = Math.min(distance * FOCUS_SPEED + 0.01, 0.5);
         camera.position.add(dir.multiplyScalar(speed));
         controls.target.lerp(target, FOCUS_SPEED * 1.5);

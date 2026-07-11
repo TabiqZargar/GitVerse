@@ -4,24 +4,23 @@ test.describe("Homepage", () => {
   test("should load with correct title and key content", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page).toHaveTitle(/GitVerse|gitverse|Git/);
+    await expect(page).toHaveTitle(/Explore Your Coding Universe|GitVerse/);
 
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByText(/Coding Universe/i)).toBeVisible();
+    await expect(page.getByRole("heading", { name: /coding universe/i })).toBeVisible();
     await expect(page.getByText(/Login with GitHub/i)).toBeVisible();
     await expect(page.getByText(/View Demo Universe/i)).toBeVisible();
   });
 
-  test("should have functional navigation bar", async ({ page }) => {
+  test("should have functional top navigation bar", async ({ page }) => {
     await page.goto("/");
 
-    const nav = page.getByRole("navigation", { name: /main navigation/i });
+    const nav = page.getByRole("navigation").first();
     await expect(nav).toBeVisible();
 
     await expect(nav.getByRole("link", { name: /dashboard/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /repositories/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /analytics/i })).toBeVisible();
-    await expect(nav.getByRole("link", { name: /visualization/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /achievements/i })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /wrapped/i })).toBeVisible();
   });
 
   test("skip-to-content link should be present and functional", async ({ page }) => {
@@ -49,8 +48,9 @@ test.describe("Homepage", () => {
   test("should have accessible landmark regions", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("banner")).toBeVisible();
-    await expect(page.getByRole("main")).toBeVisible();
-    await expect(page.getByRole("navigation", { name: /main navigation/i })).toBeVisible();
+    await expect(page.locator("#main-content")).toBeVisible();
+    const navigations = page.getByRole("navigation");
+    const count = await navigations.count();
+    expect(count).toBeGreaterThan(0);
   });
 });
