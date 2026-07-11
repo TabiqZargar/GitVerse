@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -21,8 +21,6 @@ export function SceneContainer({
   loadingOverlay,
   label,
 }: SceneContainerProps) {
-  const [loaded, setLoaded] = useState(false);
-
   return (
     <div
       className={cn(
@@ -57,10 +55,7 @@ export function SceneContainer({
         <div className="pointer-events-none absolute inset-0 z-10">{overlay}</div>
       )}
 
-      <div
-        className={cn("relative z-0 h-full w-full", !loaded && "opacity-0")}
-        onLoad={() => setLoaded(true)}
-      >
+      <div className="relative z-0 h-full w-full">
         {children}
       </div>
 

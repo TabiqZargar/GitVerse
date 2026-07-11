@@ -118,7 +118,7 @@ export function LeftPanel({ className }: LeftPanelProps) {
       ) : isLoading ? (
         <GlassPanel>
           <GlassPanelContent className="flex items-center justify-center py-12">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary/30 border-t-primary" role="status" aria-label="Loading profile" />
           </GlassPanelContent>
         </GlassPanel>
       ) : (
@@ -128,6 +128,7 @@ export function LeftPanel({ className }: LeftPanelProps) {
               <span className="text-lg">G</span>
             </div>
             <p className="text-sm font-medium">Sign in to view your profile</p>
+            <a href="/login" className="text-primary text-sm font-medium hover:underline mt-2">Sign in with GitHub</a>
           </GlassPanelContent>
         </GlassPanel>
       )}

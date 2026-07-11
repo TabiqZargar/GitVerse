@@ -15,9 +15,9 @@ export function ShareButton({ userId, type, data, label = "Share" }: ShareButton
   const [copying, setCopying] = useState(false);
 
   const handleCreate = async () => {
-    const res = await apiClient.post<{ url: string }>("/share", { userId, type, data });
+    const res = await apiClient.post<{ data: { url: string } }>("/share", { userId, type, data });
     if (res.success) {
-      setUrl(res.data.url);
+      setUrl(res.data.data.url);
       setCopying(false);
     }
   };

@@ -71,7 +71,7 @@ export function DeveloperAvatar({
         </div>
       )}
       {glow && (
-        <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/10 blur-xl" />
+        <div className="pointer-events-none absolute inset-0 rounded-full bg-primary/10 blur-xl" aria-hidden="true" />
       )}
     </div>
   );

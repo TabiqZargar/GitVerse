@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { getShareData } from "@/features/share/engine/share-engine";
 
 export async function GET(
@@ -9,10 +10,10 @@ export async function GET(
     const { id } = await params;
     const data = await getShareData(id);
     if (!data) {
-      return NextResponse.json({ data: null });
+      return apiErrorResponse(new Error("Share not found"));
     }
-    return NextResponse.json({ data });
-  } catch {
-    return NextResponse.json({ error: { message: "Failed to fetch share" } }, { status: 500 });
+    return apiSuccessResponse(data);
+  } catch (error) {
+    return apiErrorResponse(error);
   }
 }

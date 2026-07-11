@@ -51,7 +51,7 @@ export function AchievementCard({ title, date, icon, rarity, locked, progress }:
       </h3>
       
       {locked ? (
-        <div className="w-2/3 bg-white/5 h-1 mt-unit-md rounded-full overflow-hidden">
+        <div className="w-2/3 bg-white/5 h-1 mt-unit-md rounded-full overflow-hidden" role="progressbar" aria-valuenow={progress ?? 0} aria-valuemin={0} aria-valuemax={100} aria-label={`${title} progress`}>
           <motion.div 
             className="bg-secondary/60 h-full" 
             initial={{ width: 0 }}

@@ -1,22 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
+import { z } from "zod";
 import { auth } from "@/lib/auth";
-import { createShareLink } from "@/features/share/engine/share-engine";
+import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
+import { createShareLink, type ShareContentType } from "@/features/share/engine/share-engine";
+
+const shareSchema = z.object({
+  type: z.string().min(1, "Type is required"),
+  data: z.record(z.unknown()),
+});
 
 export async function POST(request: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: { message: "Unauthorized" } }, { status: 401 });
-  }
-
   try {
-    const { type, data } = await request.json();
+    const session = await auth();
+    if (!session?.user?.id) {
+      return apiErrorResponse(new Error("Unauthorized"));
+    }
+
+    const body = await request.json();
+    const parsed = shareSchema.safeParse(body);
+    if (!parsed.success) {
+      return apiErrorResponse(new Error(parsed.error.errors[0]?.message ?? "Invalid request body"));
+    }
+
+    const { type, data } = parsed.data as { type: ShareContentType; data: Record<string, unknown> };
     const result = await createShareLink({
       userId: session.user.id,
       type,
       data,
     });
-    return NextResponse.json({ data: result });
-  } catch {
-    return NextResponse.json({ error: { message: "Failed to create share link" } }, { status: 500 });
+    return apiSuccessResponse(result);
+  } catch (error) {
+    return apiErrorResponse(error);
   }
 }

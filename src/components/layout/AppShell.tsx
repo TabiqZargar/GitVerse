@@ -4,7 +4,7 @@ import { SideNav } from "./SideNav";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background">
-      <div className="noise-overlay" />
+      <div className="noise-overlay" aria-hidden="true" />
       <TopNav />
       <div className="flex">
         <SideNav />

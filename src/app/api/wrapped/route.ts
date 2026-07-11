@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServices, getGitHubToken } from "@/features/github/services";
+import { auth } from "@/lib/auth";
 import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { computeDeveloperSummary } from "@/features/analytics/services/summary.service";
 
@@ -43,6 +44,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return apiErrorResponse(new Error("Not authenticated"));
+    }
+
     const body = await request.json();
     const { prompt } = body as { prompt?: string };
 

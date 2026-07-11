@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { createServices, getGitHubToken } from "@/features/github/services";
+import { apiSuccessResponse, apiErrorResponse } from "@/lib/api-error";
 import { computeDeveloperSummary } from "@/features/analytics/services/summary.service";
 import { evaluateAchievements } from "@/features/achievements/engine/achievement-engine";
 import { ACHIEVEMENT_DEFINITIONS } from "@/features/achievements/engine/achievement-rules";
@@ -57,36 +58,34 @@ export async function GET(
         url: r.url,
       }));
 
-    return NextResponse.json({
-      data: {
-        username: profile.login,
-        name: profile.name ?? profile.login,
-        avatarUrl: profile.avatarUrl,
-        bio: profile.bio,
-        stats: {
-          totalContributions: summary.statistics.totalContributions,
-          totalRepos: repos.length,
-          totalStars: repos.reduce((s, r) => s + r.stars, 0),
-          longestStreak: summary.streaks.longestStreak,
-          currentStreak: summary.streaks.currentStreak,
-          languagesCount: summary.language.diversity,
-          developerScore: summary.scores.developer.total,
-          developerGrade: summary.scores.developer.grade,
-        },
-        topRepos,
-        achievements: {
-          total: ACHIEVEMENT_DEFINITIONS.length,
-          unlocked: unlockedIds.size,
-          recent: unlockedAchievements,
-        },
-        milestones: milestones.map((m) => ({
-          id: m.id,
-          label: m.label,
-          date: m.date,
-        })),
+    return apiSuccessResponse({
+      username: profile.login,
+      name: profile.name ?? profile.login,
+      avatarUrl: profile.avatarUrl,
+      bio: profile.bio,
+      stats: {
+        totalContributions: summary.statistics.totalContributions,
+        totalRepos: repos.length,
+        totalStars: repos.reduce((s, r) => s + r.stars, 0),
+        longestStreak: summary.streaks.longestStreak,
+        currentStreak: summary.streaks.currentStreak,
+        languagesCount: summary.language.diversity,
+        developerScore: summary.scores.developer.total,
+        developerGrade: summary.scores.developer.grade,
       },
+      topRepos,
+      achievements: {
+        total: ACHIEVEMENT_DEFINITIONS.length,
+        unlocked: unlockedIds.size,
+        recent: unlockedAchievements,
+      },
+      milestones: milestones.map((m) => ({
+        id: m.id,
+        label: m.label,
+        date: m.date,
+      })),
     });
-  } catch {
-    return NextResponse.json({ data: null });
+  } catch (error) {
+    return apiErrorResponse(error);
   }
 }

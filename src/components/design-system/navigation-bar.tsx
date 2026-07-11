@@ -112,6 +112,7 @@ export function NavigationBar() {
             className="md:hidden text-muted-foreground hover:text-foreground rounded-lg p-2 transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -14,7 +16,7 @@ export function SideNav() {
             <h2 className="font-headline-sm text-primary font-black">Universe</h2>
             <p className="font-label-mono text-[10px] text-on-surface-variant uppercase tracking-widest">v2.4 Orbit</p>
           </div>
-          <nav className="space-y-1">
+          <nav className="space-y-1" aria-label="Main navigation">
             {[
               { label: "Command Center", icon: "dashboard", href: "/dashboard" },
               { label: "Landscape", icon: "terrain", href: "/landscape" },
@@ -27,7 +29,7 @@ export function SideNav() {
                 href={item.href} 
                 className="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-white/5 hover:text-on-surface rounded-lg transition-all duration-300 group"
               >
-                <motion.span whileHover={{ rotate: 10 }} className="material-symbols-outlined">{item.icon}</motion.span>
+                <motion.span whileHover={{ rotate: 10 }} className="material-symbols-outlined" aria-hidden="true">{item.icon}</motion.span>
                 <span className="font-label-mono text-label-mono">{item.label}</span>
               </Link>
             ))}

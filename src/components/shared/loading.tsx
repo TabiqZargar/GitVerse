@@ -16,7 +16,7 @@ const sizeClasses = {
 
 export function Loading({ className, size = "md", text }: LoadingProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center gap-4" role="status" aria-label={text ?? "Loading"}>
       <div className={cn("relative", sizeClasses[size], className)}>
         <div
           className={cn(

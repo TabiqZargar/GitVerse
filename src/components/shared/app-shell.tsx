@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { NavigationBar } from "@/components/design-system/navigation-bar";
 import { ReplayTimeline } from "@/features/replay/components/timeline";
 import { usePlayback } from "@/features/replay/hooks";
@@ -14,8 +14,6 @@ interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
-  const [leftOpen] = useState(true);
-  const [rightOpen] = useState(true);
 
   usePlayback();
 
@@ -69,12 +67,7 @@ export function AppShell({ children }: AppShellProps) {
             "transition-all duration-500"
           )}
         >
-          <LeftPanel
-            className={cn(
-              "w-72 shrink-0 transition-all duration-500",
-              leftOpen ? "opacity-100" : "w-0 overflow-hidden opacity-0 px-0"
-            )}
-          />
+          <LeftPanel className="w-72 shrink-0" />
 
           <main
             className="flex min-w-0 flex-1 flex-col gap-4"
@@ -90,12 +83,7 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           </main>
 
-          <RightPanel
-            className={cn(
-              "w-72 shrink-0 transition-all duration-500",
-              rightOpen ? "opacity-100" : "w-0 overflow-hidden opacity-0 px-0"
-            )}
-          />
+          <RightPanel className="w-72 shrink-0" />
         </div>
       </div>
 
